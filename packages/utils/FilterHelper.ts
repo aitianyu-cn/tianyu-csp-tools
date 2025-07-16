@@ -1,9 +1,8 @@
 /** @format */
 
-import { IAdvancedFilter, IFilter } from "#interface";
-
 import * as SimpleFilter from "./lib/SimpleFilterProcessor";
 import * as AdvancedFilter from "./lib/AdvancedFilterProcessor";
+import { IAdvancedFilter, IFilter } from "@aitianyu.cn/tianyu-csp";
 
 export class FilterHelper {
     public static formatForSql(filter: IFilter | IAdvancedFilter): string {

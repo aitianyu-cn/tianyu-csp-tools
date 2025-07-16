@@ -1,11 +1,10 @@
 /** @format */
 
+import { OperationError, TianyuCSP } from "@aitianyu.cn/tianyu-csp";
 import * as mysql from "mysql";
-import { INFRA_ERROR_CODES } from "#core/Constant";
-import { MysqlService } from "#core/infra/db/MysqlService";
-import { OperationError } from "#interface";
+import { MysqlService } from "packages/db";
 
-describe("aitianyu-cn.node-module.tianyu-csp.unit.core.infra.db.MysqlService", () => {
+describe("aitianyu-cn.node-module.tianyu-csp.unit.core.TianyuCSP.Common.db.MysqlService", () => {
     const databaseConfig = {
         host: "server.tencent.backend.aitianyu.cn",
         port: 3306,
@@ -14,7 +13,11 @@ describe("aitianyu-cn.node-module.tianyu-csp.unit.core.infra.db.MysqlService", (
     };
     const databaseName = "test_db";
 
-    const service = new MysqlService(databaseName, databaseConfig);
+    let service: MysqlService;
+
+    beforeAll(() => {
+        service = new MysqlService(databaseName, databaseConfig);
+    });
 
     afterAll(() => {
         service.close();
@@ -31,7 +34,7 @@ describe("aitianyu-cn.node-module.tianyu-csp.unit.core.infra.db.MysqlService", (
             });
 
             (service as any)._getConnection().then(done.fail, (error: OperationError) => {
-                expect(error.code).toEqual(INFRA_ERROR_CODES.DATABASE_GENERAL_ERROR);
+                expect(error.code).toEqual(TianyuCSP.Common.INFRA_ERROR_CODES.DATABASE_GENERAL_ERROR);
                 expect(error.message).toEqual(`Database (${databaseName}) Error`);
                 expect(error.error).toEqual("test_error");
                 done();
@@ -49,7 +52,7 @@ describe("aitianyu-cn.node-module.tianyu-csp.unit.core.infra.db.MysqlService", (
             });
 
             (service as any)._getConnection().then(done.fail, (error: OperationError) => {
-                expect(error.code).toEqual(INFRA_ERROR_CODES.DATABASE_CONNECTION_CREATION_ERROR);
+                expect(error.code).toEqual(TianyuCSP.Common.INFRA_ERROR_CODES.DATABASE_CONNECTION_CREATION_ERROR);
                 expect(error.message).toEqual(`Database (${databaseName}) Connection Create Failed`);
                 expect(error.error).toEqual("test_error");
                 done();
@@ -87,7 +90,7 @@ describe("aitianyu-cn.node-module.tianyu-csp.unit.core.infra.db.MysqlService", (
                     done.fail();
                 },
                 (error) => {
-                    expect(error.code).toEqual(INFRA_ERROR_CODES.DATABASE_QUERY_EXECUTION_ERROR);
+                    expect(error.code).toEqual(TianyuCSP.Common.INFRA_ERROR_CODES.DATABASE_QUERY_EXECUTION_ERROR);
                     expect(error.message).toEqual(`Database (${databaseName}) Query ("sql") Execution Failed`);
                     expect(error.error).toEqual("test_error");
                     done();
@@ -133,7 +136,7 @@ describe("aitianyu-cn.node-module.tianyu-csp.unit.core.infra.db.MysqlService", (
                     done.fail();
                 },
                 (error) => {
-                    expect(error.code).toEqual(INFRA_ERROR_CODES.DATABASE_QUERY_TRANSACTION_ERROR);
+                    expect(error.code).toEqual(TianyuCSP.Common.INFRA_ERROR_CODES.DATABASE_QUERY_TRANSACTION_ERROR);
                     expect(error.message).toEqual(`Database (${databaseName}) Transaction Operation Failed`);
                     expect(error.error).toEqual("test_error");
                     done();
@@ -167,7 +170,7 @@ describe("aitianyu-cn.node-module.tianyu-csp.unit.core.infra.db.MysqlService", (
                 (error) => {
                     expect(connection.rollback).toHaveBeenCalled();
 
-                    expect(error.code).toEqual(INFRA_ERROR_CODES.DATABASE_BATCH_QUERY_EXECUTION_ERROR);
+                    expect(error.code).toEqual(TianyuCSP.Common.INFRA_ERROR_CODES.DATABASE_BATCH_QUERY_EXECUTION_ERROR);
                     expect(error.message).toEqual(`Database (${databaseName}) Transaction Query Execution Failed`);
                     done();
                 },
@@ -222,7 +225,7 @@ describe("aitianyu-cn.node-module.tianyu-csp.unit.core.infra.db.MysqlService", (
                     done.fail();
                 },
                 (error) => {
-                    expect(error.code).toEqual(INFRA_ERROR_CODES.DATABASE_QUERY_EXECUTION_ERROR);
+                    expect(error.code).toEqual(TianyuCSP.Common.INFRA_ERROR_CODES.DATABASE_QUERY_EXECUTION_ERROR);
                     expect(error.message).toEqual(`Database (${databaseName}) Query ("sql") Execution Failed`);
                     expect(error.error).toEqual("test_error");
                     done();

@@ -2,21 +2,9 @@
     "name": "tianyu-csp-tools",
     "version": "0.0.1",
     "description": "Tools of Tianyu Common Service Platform",
+    "types": "./dist/types/index.d.ts",
     "exports": {
-        ".": {
-            "types": "./dist/types/index.d.ts",
-            "import": "./dist/lib/index.js",
-            "require": "./dist/lib/index.js",
-            "node": "./dist/lib/index.js",
-            "default": "./dist/lib/index.js"
-        }
-    },
-    "typesVersions": {
-        "*": {
-            "*": [
-                "./dist/types/index.d.ts"
-            ]
-        }
+        ".": "./dist/lib/index.js"
     },
     "type": "commonjs",
     "files": [
@@ -26,7 +14,7 @@
         "start": "node \"./scripts/starter.js\"",
         "after-build": "rimraf ./build",
         "before-build": "rimraf ./build ./dist",
-        "build": "npm run before-build && npm run compiler && npm run copy && npm run after-build",
+        "build": "eslint \"./\" --quiet && npm run before-build && npm run compiler && npm run copy && npm run after-build",
         "compiler": "tsc -p \"./tsconfig.build.json\" && tsc-alias -p \"./tsconfig.build.json\"",
         "copy": "npm run copy-lib && npm run copy-types && npm run copy-basic-res",
         "copy-lib": "copyfiles -u 2 \"build/packages/**/*.js\" dist/lib",
@@ -34,11 +22,13 @@
         "copy-basic-res": "copyfiles -u 1 \"packages/**/*.json\" \"packages/**/*.html\" \"packages/**/*.config.json\" \"packages/**/configs/**\" dist/lib",
         "copy-basic-types": "copyfiles -u 1 \"packages/**/*.d.ts\" dist/types",
         "test": "jest --no-cache --verbose --passWithNoTests",
-        "test-all": "jest --no-cache --verbose --coverage --passWithNoTests --detectOpenHandles",
+        "test-all": "jest --no-cache --verbose --coverage --passWithNoTests --detectOpenHandles && npm run eslint-report",
         "test-coverage": "jest --no-cache --coverage --passWithNoTests",
         "test-env-load": "node \"./test/config/test-loader.mjs\"",
         "test-auto": "npm run build && npm run test-env-load && npm run test-all",
-        "deploy-build": "npm run build && node \"./scripts/deploy.js\""
+        "deploy-build": "npm run build && node \"./scripts/deploy.js\"",
+        "eslint": "eslint . --format json --output-file \"./test/__report__/eslint/eslint-report.json\"",
+        "eslint-report": "eslint . --format html --output-file \"./test/__report__/eslint/eslint-report.html\""
     },
     "repository": {
         "type": "git",
@@ -68,7 +58,9 @@
         "ts-loader": "^9.5.1",
         "ts-node": "^10.9.2",
         "tsc-alias": "^1.8.8",
-        "typescript-eslint": "^7.2.0"
+        "typescript-eslint": "^7.2.0",
+        "eslint": "^8.57.1",
+        "eslint-plugin-import": "^2.32.0"
     },
     "dependencies": {
         "@aitianyu.cn/tianyu-csp": "^0.2.0",

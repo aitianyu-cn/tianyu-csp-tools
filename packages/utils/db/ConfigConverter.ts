@@ -10,7 +10,7 @@ import { RedisConverter } from "./RedisConverter";
  *
  * Converter of database configuration
  */
-export const DBConfigConverter = {
+export const ConfigConverter = {
     /**
      * To convert database connection config to be a mysql valid connection config
      *
@@ -18,7 +18,7 @@ export const DBConfigConverter = {
      * @returns return a mysql config
      */
     mysql: function (config: IDatabaseConnectionConfig): mysql.ConnectionConfig {
-        return Object.assign({}, config);
+        return { ...config };
     },
     /**
      * To convert database connection config to be a redis valid connection config

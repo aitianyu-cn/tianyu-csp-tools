@@ -1,20 +1,28 @@
 /** @format */
 
-import { IDBConnection, IDBLifecycle } from "#interface";
+import { IDBConnection } from "#interface";
 import * as mysql from "mysql";
 import { TianyuCSP } from "@aitianyu.cn/tianyu-csp";
+import { guid } from "@aitianyu.cn/types";
 
 /** Mysql connection manager and service */
-export class MysqlService implements IDBConnection, IDBLifecycle {
+export class MysqlService implements IDBConnection {
+    private _id: string;
     private _database: string;
     private _pool: mysql.Pool;
 
     public constructor(databaseName: string, config: mysql.ConnectionConfig) {
+        this._id = guid();
         this._database = databaseName;
         // this._pool = mysql.createPool({ ...config, database: databaseName });
         this._pool = mysql.createPool({ ...config });
+
+        TIANYU.lifecycle.join(this);
     }
 
+    public get id(): string {
+        return this._id;
+    }
     public get name(): string {
         return this._database;
     }
@@ -138,6 +146,7 @@ export class MysqlService implements IDBConnection, IDBLifecycle {
 
     public close(): void {
         this._pool.end();
+        TIANYU.lifecycle.leave(this.id);
     }
 
     private async _getConnection(): Promise<mysql.PoolConnection> {

@@ -1,6 +1,6 @@
 /** @format */
 
-import { IFilter } from "#interface";
+import { IFilter } from "@aitianyu.cn/tianyu-csp";
 import { processValue } from "./SqlProcessor";
 
 export function formatForSql(filter: IFilter): string {
@@ -13,6 +13,7 @@ export function formatForSql(filter: IFilter): string {
         return `${filter.field} ${filter.exclude ? "<>" : "="} ${processValue(filter.selection[0])}`;
     }
     if (filter.selection.length === 2 && filter.range) {
+        //
     }
 
     return "";

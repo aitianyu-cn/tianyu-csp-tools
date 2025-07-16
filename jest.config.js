@@ -36,8 +36,11 @@ module.exports = {
         // "^shell-ui/(.*)$": "<rootDir>/packages/shell-ui/$1",
         // "^infra/(.*)$": "<rootDir>/packages/infra/$1",
         // "^test/(.*)$": "<rootDir>/__test__/$1",
+        "^packages$": "<rootDir>/packages/index.ts",
         "^packages/(.*)$": "<rootDir>/packages/$1",
+        "^#interface$": "<rootDir>/packages/interface/index.ts",
     },
+    testPathIgnorePatterns: ["<rootDir>/.doc"],
     coveragePathIgnorePatterns: ["<rootDir>/test/"],
     // transformIgnorePatterns: ["<rootDir>/node_modules/$"],
 };

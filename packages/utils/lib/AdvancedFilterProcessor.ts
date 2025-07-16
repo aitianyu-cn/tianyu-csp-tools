@@ -1,7 +1,7 @@
 /** @format */
 
-import { IAdvancedFilter } from "#interface";
+import { IAdvancedFilter } from "@aitianyu.cn/tianyu-csp";
 
-export function formatForSql(filter: IAdvancedFilter): string {
+export function formatForSql(_filter: IAdvancedFilter): string {
     return "";
 }
