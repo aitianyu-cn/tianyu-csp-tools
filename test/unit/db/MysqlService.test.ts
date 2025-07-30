@@ -4,19 +4,20 @@ import { OperationError, TianyuCSP } from "@aitianyu.cn/tianyu-csp";
 import * as mysql from "mysql";
 import { MysqlService } from "packages/db";
 
-describe("aitianyu-cn.node-module.tianyu-csp.unit.core.TianyuCSP.Common.db.MysqlService", () => {
+describe("aitianyu-cn.node-module.tianyu-csp-tools.unit.db.MysqlService", () => {
+    const databaseName = "test_db";
     const databaseConfig = {
         host: "server.tencent.backend.aitianyu.cn",
         port: 3306,
         user: "root",
         password: "ysy1998ysy[]",
+        database: databaseName,
     };
-    const databaseName = "test_db";
 
     let service: MysqlService;
 
     beforeAll(() => {
-        service = new MysqlService(databaseName, databaseConfig);
+        service = new MysqlService(databaseConfig);
     });
 
     afterAll(() => {

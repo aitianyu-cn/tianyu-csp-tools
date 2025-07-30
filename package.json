@@ -1,5 +1,5 @@
 {
-    "name": "tianyu-csp-tools",
+    "name": "@aitianyu.cn/tianyu-csp-tools",
     "version": "0.0.1",
     "description": "Tools of Tianyu Common Service Platform",
     "types": "./dist/types/index.d.ts",
@@ -8,7 +8,8 @@
     },
     "type": "commonjs",
     "files": [
-        "dist"
+        "dist",
+        "update.md"
     ],
     "scripts": {
         "start": "node \"./scripts/starter.js\"",
@@ -37,7 +38,8 @@
     "keywords": [
         "aitianyu.cn",
         "server",
-        "platform-tools"
+        "platform-tools",
+        "tianyu-csp"
     ],
     "author": "dev.aitianyu.cn@outlook.com",
     "license": "MIT",

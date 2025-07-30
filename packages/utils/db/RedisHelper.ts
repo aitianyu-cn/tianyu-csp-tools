@@ -5,7 +5,7 @@
  *
  * Converter of Redis
  */
-export class RedisConverter {
+export class RedisHelper {
     /**
      * To get a database index from giving database name.
      *

@@ -21,7 +21,9 @@
         "baseUrl": ".",
         "outDir": "./build",
         "paths": {
-            "#interface": ["packages/interface/index.ts"]
+            "#interface": ["packages/interface/index.ts"],
+            "#utils/*": ["packages/utils/*"],
+            "#core-db": ["packages/db/index.ts"]
         }
     }
 }

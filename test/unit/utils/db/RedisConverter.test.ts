@@ -1,12 +1,12 @@
 /** @format */
 
-import { Utils } from "packages";
+import { DatabaseConfigHelper } from "#utils/db/DatabaseConfigHelper";
 
-describe("aitianyu-cn.node-module.tianyu-csp.unit.utils.db.RedisConverter", () => {
+describe("aitianyu-cn.node-module.tianyu-csp-tools.unit.utils.db.RedisConverter", () => {
     it("getDatabase", () => {
-        expect(Utils.Database.Converter.redis({}, "test").db).toEqual(0);
-        expect(Utils.Database.Converter.redis({}, "17").db).toEqual(0);
-        expect(Utils.Database.Converter.redis({}, "-1").db).toEqual(0);
-        expect(Utils.Database.Converter.redis({}, "10").db).toEqual(10);
+        expect(DatabaseConfigHelper.redis({ database: "test" }).db).toEqual(0);
+        expect(DatabaseConfigHelper.redis({ database: "17" }).db).toEqual(0);
+        expect(DatabaseConfigHelper.redis({ database: "-1" }).db).toEqual(0);
+        expect(DatabaseConfigHelper.redis({ database: "10" }).db).toEqual(10);
     });
 });

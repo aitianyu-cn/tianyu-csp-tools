@@ -1,11 +1,17 @@
 /** @format */
 
+import { IDatabaseConnectionConfig } from "#interface";
+import { DatabaseConfigHelper } from "#utils/db/DatabaseConfigHelper";
 import { IReleasable } from "@aitianyu.cn/tianyu-csp";
 import { guid } from "@aitianyu.cn/types";
 import { Callback, Redis } from "ioredis";
 
 export class RedisService extends Redis implements IReleasable {
     private _id: string = guid();
+
+    public constructor(config: IDatabaseConnectionConfig) {
+        super(DatabaseConfigHelper.redis(config));
+    }
 
     public get id(): string {
         return this._id;

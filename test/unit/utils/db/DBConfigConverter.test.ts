@@ -1,9 +1,9 @@
 /** @format */
 
 import { IDatabaseConnectionConfig } from "#interface";
-import { Utils } from "packages";
+import { DatabaseConfigHelper } from "#utils/db/DatabaseConfigHelper";
 
-describe("aitianyu-cn.node-module.tianyu-csp.unit.utils.db.DBHelper.converter", () => {
+describe("aitianyu-cn.node-module.tianyu-csp-tools.unit.utils.db.DBConfigConverter", () => {
     describe("toMysql", () => {
         it("-", () => {
             const config: IDatabaseConnectionConfig = {
@@ -13,7 +13,7 @@ describe("aitianyu-cn.node-module.tianyu-csp.unit.utils.db.DBHelper.converter", 
                 password: "test",
                 timeout: 3000,
             };
-            const configForMysql = Utils.Database.Converter.mysql(config);
+            const configForMysql = DatabaseConfigHelper.mysql(config);
 
             expect(configForMysql).toEqual(config);
         });
@@ -27,8 +27,9 @@ describe("aitianyu-cn.node-module.tianyu-csp.unit.utils.db.DBHelper.converter", 
                 user: "test",
                 password: "test",
                 timeout: 3000,
+                database: "test_1",
             };
-            const configForRedis = Utils.Database.Converter.redis(config, "test_1");
+            const configForRedis = DatabaseConfigHelper.redis(config);
 
             expect(configForRedis.host).toEqual("server");
             expect(configForRedis.port).toEqual(3306);
@@ -39,13 +40,25 @@ describe("aitianyu-cn.node-module.tianyu-csp.unit.utils.db.DBHelper.converter", 
         });
 
         it("default setting", () => {
-            const config: IDatabaseConnectionConfig = {};
-            const configForRedis = Utils.Database.Converter.redis(config, "test_1");
+            const config: IDatabaseConnectionConfig = {
+                database: "test_1",
+            };
+            const configForRedis = DatabaseConfigHelper.redis(config);
 
             expect(configForRedis.host).toEqual("localhost");
             expect(configForRedis.port).toEqual(6379);
             expect(configForRedis.username).toEqual("default");
             expect(configForRedis.db).toEqual(1);
+        });
+
+        it("no given database name", () => {
+            const config: IDatabaseConnectionConfig = {};
+            const configForRedis = DatabaseConfigHelper.redis(config);
+
+            expect(configForRedis.host).toEqual("localhost");
+            expect(configForRedis.port).toEqual(6379);
+            expect(configForRedis.username).toEqual("default");
+            expect(configForRedis.db).toEqual(0);
         });
     });
 });

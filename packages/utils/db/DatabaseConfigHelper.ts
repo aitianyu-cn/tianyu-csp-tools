@@ -3,23 +3,39 @@
 import { IDatabaseConnectionConfig } from "#interface";
 import { RedisOptions } from "ioredis";
 import * as mysql from "mysql";
-import { RedisConverter } from "./RedisConverter";
+import { RedisHelper } from "./RedisHelper";
 
 /**
  * @public
  *
  * Converter of database configuration
  */
-export const ConfigConverter = {
+export class DatabaseConfigHelper {
     /**
      * To convert database connection config to be a mysql valid connection config
      *
      * @param config source config
      * @returns return a mysql config
      */
-    mysql: function (config: IDatabaseConnectionConfig): mysql.ConnectionConfig {
+    public static mysql(config: IDatabaseConnectionConfig): mysql.ConnectionConfig {
         return { ...config };
-    },
+    }
+
+    /* istanbul ignore next */
+    public static postgre(config: IDatabaseConnectionConfig): IDatabaseConnectionConfig {
+        return { ...config };
+    }
+
+    /* istanbul ignore next */
+    public static sqlserver(config: IDatabaseConnectionConfig): IDatabaseConnectionConfig {
+        return { ...config };
+    }
+
+    /* istanbul ignore next */
+    public static oracle(config: IDatabaseConnectionConfig): IDatabaseConnectionConfig {
+        return { ...config };
+    }
+
     /**
      * To convert database connection config to be a redis valid connection config
      *
@@ -34,10 +50,10 @@ export const ConfigConverter = {
      * 2. database name: "database2" => 2
      *
      * @example
-     * The database of redis only contains 16 databases, thus we can only accept number 0 to 15,
-     * if the value is over 15 or less than 0, the 0 value will be assigned.
+     * The database of redis only contains 16 databases thus we can only accept number 0 to 15
+     * if the value is over 15 or less than 0 the 0 value will be assigned.
      */
-    redis: function (config: IDatabaseConnectionConfig, database: string): RedisOptions {
+    public static redis(config: IDatabaseConnectionConfig): RedisOptions {
         const options: RedisOptions = {};
 
         options.host = config.host || "localhost";
@@ -47,11 +63,16 @@ export const ConfigConverter = {
         options.commandTimeout = config.timeout;
 
         {
-            options.db = RedisConverter.getDatabase(database);
+            options.db = RedisHelper.getDatabase(config.database || "0");
 
             // for more configs will be supported in the feature
         }
 
         return options;
-    },
-};
+    }
+
+    /* istanbul ignore next */
+    public static mongodb(config: IDatabaseConnectionConfig): IDatabaseConnectionConfig {
+        return { ...config };
+    }
+}

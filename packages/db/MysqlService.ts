@@ -1,9 +1,10 @@
 /** @format */
 
-import { IDBConnection } from "#interface";
+import { IDatabaseConnectionConfig, IDBConnection } from "#interface";
 import * as mysql from "mysql";
 import { TianyuCSP } from "@aitianyu.cn/tianyu-csp";
 import { guid } from "@aitianyu.cn/types";
+import { DatabaseConfigHelper } from "#utils/db/DatabaseConfigHelper";
 
 /** Mysql connection manager and service */
 export class MysqlService implements IDBConnection {
@@ -11,11 +12,10 @@ export class MysqlService implements IDBConnection {
     private _database: string;
     private _pool: mysql.Pool;
 
-    public constructor(databaseName: string, config: mysql.ConnectionConfig) {
+    public constructor(config: IDatabaseConnectionConfig) {
         this._id = guid();
-        this._database = databaseName;
-        // this._pool = mysql.createPool({ ...config, database: databaseName });
-        this._pool = mysql.createPool({ ...config });
+        this._database = config.database || /* istanbul ignore next */ "";
+        this._pool = mysql.createPool(DatabaseConfigHelper.mysql(config));
 
         TIANYU.lifecycle.join(this);
     }

@@ -39,8 +39,10 @@ module.exports = {
         "^packages$": "<rootDir>/packages/index.ts",
         "^packages/(.*)$": "<rootDir>/packages/$1",
         "^#interface$": "<rootDir>/packages/interface/index.ts",
+        "^#utils/(.*)$": "<rootDir>/packages/utils/$1",
+        "^#core-db$": "<rootDir>/packages/db/index.ts",
     },
     testPathIgnorePatterns: ["<rootDir>/.doc"],
-    coveragePathIgnorePatterns: ["<rootDir>/test/"],
+    coveragePathIgnorePatterns: ["<rootDir>/test/", "<rootDir>/packages/db/RedisClusterService.ts"],
     // transformIgnorePatterns: ["<rootDir>/node_modules/$"],
 };
