@@ -1,0 +1,181 @@
+/** @format */
+
+import { IDatabaseConnectionConfig, IDBConnection } from "#interface";
+import * as mysql from "mysql";
+import { TianyuCSP } from "@aitianyu.cn/tianyu-csp";
+import { guid } from "@aitianyu.cn/types";
+import { DatabaseConfigHelper } from "#utils/db/DatabaseConfigHelper";
+
+/** Mysql connection manager and service */
+export class MysqlService implements IDBConnection {
+    private _id: string;
+    private _database: string;
+    private _pool: mysql.Pool;
+
+    public constructor(config: IDatabaseConnectionConfig) {
+        this._id = guid();
+        this._database = config.database || /* istanbul ignore next */ "";
+        this._pool = mysql.createPool(DatabaseConfigHelper.mysql(config));
+
+        TIANYU.lifecycle.join(this);
+    }
+
+    public get id(): string {
+        return this._id;
+    }
+    public get name(): string {
+        return this._database;
+    }
+
+    public async execute(sql: string): Promise<void> {
+        if (!sql) {
+            return;
+        }
+
+        const connection = await this._getConnection();
+        return new Promise<void>((resolve, reject) => {
+            connection.query(sql, (error: mysql.MysqlError | null) => {
+                connection.release();
+
+                if (error) {
+                    reject(
+                        TianyuCSP.Utils.ErrorHelper.getError(
+                            TianyuCSP.Common.INFRA_ERROR_CODES.DATABASE_QUERY_EXECUTION_ERROR,
+                            `Database (${this._database}) Query ("${sql}") Execution Failed`,
+                            error.message,
+                        ),
+                    );
+                    return;
+                }
+
+                resolve();
+            });
+        });
+    }
+    public async executeBatch(sqls: string[]): Promise<void> {
+        if (!sqls.length) {
+            return;
+        }
+
+        const connection = await this._getConnection();
+        return new Promise<void>((resolve, reject) => {
+            connection.beginTransaction((transactionError: mysql.MysqlError | null) => {
+                if (transactionError) {
+                    reject(
+                        TianyuCSP.Utils.ErrorHelper.getError(
+                            TianyuCSP.Common.INFRA_ERROR_CODES.DATABASE_QUERY_TRANSACTION_ERROR,
+                            `Database (${this._database}) Transaction Operation Failed`,
+                            transactionError.message,
+                        ),
+                    );
+                    connection.release();
+                    return;
+                }
+
+                const queryPromises: Promise<void>[] = [];
+                for (const sql of sqls) {
+                    queryPromises.push(
+                        new Promise<void>((done, fail) => {
+                            connection.query(sql, (error: mysql.MysqlError | null) => {
+                                if (error) {
+                                    fail(
+                                        TianyuCSP.Utils.ErrorHelper.getError(
+                                            TianyuCSP.Common.INFRA_ERROR_CODES.DATABASE_QUERY_EXECUTION_ERROR,
+                                            `Database (${this._database}) Query ("${sql}") Execution Failed`,
+                                            error.message,
+                                        ),
+                                    );
+                                    return;
+                                }
+                                done();
+                            });
+                        }),
+                    );
+                }
+
+                Promise.all(queryPromises)
+                    .then(
+                        () => {
+                            connection.commit();
+                            resolve();
+                        },
+                        (error) => {
+                            connection.rollback();
+                            reject(
+                                TianyuCSP.Utils.ErrorHelper.getError(
+                                    TianyuCSP.Common.INFRA_ERROR_CODES.DATABASE_BATCH_QUERY_EXECUTION_ERROR,
+                                    `Database (${this._database}) Transaction Query Execution Failed`,
+                                    /* istanbul ignore next */ error.error || error.message,
+                                ),
+                            );
+                        },
+                    )
+                    .finally(() => {
+                        if (connection.threadId) {
+                            connection.release();
+                        }
+                    });
+            });
+        });
+    }
+    public async query(sql: string): Promise<any> {
+        if (!sql) {
+            return [];
+        }
+
+        const connection = await this._getConnection();
+        return new Promise<any>((resolve, reject) => {
+            connection.query(sql, (error: mysql.MysqlError | null, result?: any) => {
+                connection.release();
+
+                if (error) {
+                    reject(
+                        TianyuCSP.Utils.ErrorHelper.getError(
+                            TianyuCSP.Common.INFRA_ERROR_CODES.DATABASE_QUERY_EXECUTION_ERROR,
+                            `Database (${this._database}) Query ("${sql}") Execution Failed`,
+                            error.message,
+                        ),
+                    );
+                    return;
+                }
+
+                resolve(result);
+            });
+        });
+    }
+
+    public close(): void {
+        this._pool.end();
+        TIANYU.lifecycle.leave(this.id);
+    }
+
+    private async _getConnection(): Promise<mysql.PoolConnection> {
+        return new Promise<mysql.PoolConnection>((resolve, reject) => {
+            try {
+                this._pool.getConnection((error: mysql.MysqlError | null, connection: mysql.PoolConnection) => {
+                    if (error) {
+                        reject(
+                            TianyuCSP.Utils.ErrorHelper.getError(
+                                TianyuCSP.Common.INFRA_ERROR_CODES.DATABASE_CONNECTION_CREATION_ERROR,
+                                `Database (${this._database}) Connection Create Failed`,
+                                error.message,
+                            ),
+                        );
+                        connection?.destroy();
+                        return;
+                    }
+
+                    resolve(connection);
+                });
+            } catch (e) {
+                reject(
+                    TianyuCSP.Utils.ErrorHelper.getError(
+                        TianyuCSP.Common.INFRA_ERROR_CODES.DATABASE_GENERAL_ERROR,
+                        `Database (${this._database}) Error`,
+                        (e as any)?.message || /* istanbul ignore next */ undefined,
+                    ),
+                );
+            }
+        });
+    }
+}
